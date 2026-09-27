@@ -8,18 +8,8 @@ const APP_CONFIG = {
   // APP INFO
   // =========================
   APP_NAME: "TradeScan",
-  APP_SUBTITLE:
-    "Multi-Mode Trading Assistant",
+  APP_SUBTITLE: "Trading Assistant",
   VERSION: "3.1.0",
-
-  // =========================
-  // MODES
-  // =========================
-  MODES: {
-    NEW: "new",
-    WATCHLIST: "watchlist",
-    ACTIVE: "active"
-  },
 
   // =========================
   // TIMEFRAMES
@@ -38,35 +28,12 @@ const APP_CONFIG = {
   },
 
   // =========================
-  // NEW SCAN VERDICTS
+  // SCAN VERDICTS
   // =========================
   NEW_SCAN_VERDICTS: {
     BUY: "BUY",
     WATCH: "WATCH",
     AVOID: "AVOID"
-  },
-
-  // =========================
-  // WATCHLIST VERDICTS
-  // =========================
-  WATCHLIST_VERDICTS: {
-    READY: "READY",
-    MONITOR: "MONITOR",
-    REMOVE: "REMOVE"
-  },
-
-  // =========================
-  // ACTIVE TRADE VERDICTS
-  // =========================
-  ACTIVE_TRADE_VERDICTS: {
-    HOLD:
-      "CONTINUE HOLDING",
-    TRAIL:
-      "TRAIL STOP LOSS",
-    PARTIAL:
-      "PARTIAL EXIT",
-    EXIT:
-      "FULL EXIT"
   },
 
   // =========================
@@ -131,7 +98,6 @@ const APP_CONFIG = {
   // UI
   // =========================
   UI: {
-    DEFAULT_MODE: "new",
     DEFAULT_TIMEFRAME: "Daily"
   }
 };

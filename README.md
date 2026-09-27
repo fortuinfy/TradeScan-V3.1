@@ -1,2 +1,2 @@
-# TradeScanAI-v3.0
+# TradeScan-v3.1
 Stock Scanner Under Continuation Breakout & Pullback Continuation

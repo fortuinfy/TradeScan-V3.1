@@ -21,16 +21,9 @@
 <button class="help-btn">?</button>
 </div>
 </header>
-<div class="card">
-<div class="mode-selector">
-<button class="mode-btn active-mode" data-mode="new">New Scan</button>
-<button class="mode-btn" data-mode="watchlist">Watchlist Follow-Up</button>
-<button class="mode-btn" data-mode="active">Active Trade Follow-Up</button>
-</div>
-</div>
 <div class="mode-banner">
-<h2 id="modeTitle">New Scan</h2>
-<p id="modeDescription">Scan a stock and evaluate whether it deserves watchlist consideration.</p>
+<h2>New Scan</h2>
+<p>Scan a stock and evaluate whether it deserves watchlist consideration.</p>
 </div>
 <div class="card">
 <div class="section-header">
@@ -64,68 +57,6 @@
 <div class="input-group">
 <label>RSI (14)</label>
 <input type="number" id="rsi" step="0.01">
-</div>
-</div>
-</div>
-<div id="watchlistSection" class="card hidden">
-<div class="section-header">
-<h3>Watchlist Parameters</h3>
-<p>Enter the original trade plan metrics generated during the EOD scan.</p>
-</div>
-<div class="input-grid">
-<div class="input-group">
-<label>Original Setup</label>
-<select id="previousSetupWatchlist">
-<option value="CB">Continuation Breakout (CB)</option>
-<option value="PC">Pullback Continuation (PC)</option>
-</select>
-</div>
-<div class="input-group">
-<label>Previous Trigger Low</label>
-<input type="number" id="previousTriggerLow" step="0.01">
-</div>
-<div class="input-group">
-<label>Previous Trigger High</label>
-<input type="number" id="previousTriggerHigh" step="0.01">
-</div>
-<div class="input-group">
-<label>Previous Stop Loss</label>
-<input type="number" id="previousSL" step="0.01">
-</div>
-<div class="input-group">
-<label>Previous Target</label>
-<input type="number" id="previousTarget" step="0.01">
-</div>
-</div>
-</div>
-<div id="activeTradeSection" class="card hidden">
-<div class="section-header">
-<h3>Active Trade Parameters</h3>
-<p>Enter your open position details.</p>
-</div>
-<div class="input-grid">
-<div class="input-group">
-<label>Original Setup</label>
-<select id="previousSetupActive">
-<option value="CB">Continuation Breakout (CB)</option>
-<option value="PC">Pullback Continuation (PC)</option>
-</select>
-</div>
-<div class="input-group">
-<label>Executed Entry Price</label>
-<input type="number" id="executedEntry" step="0.01">
-</div>
-<div class="input-group">
-<label>Current Stop Loss</label>
-<input type="number" id="currentSL" step="0.01">
-</div>
-<div class="input-group">
-<label>Current Target</label>
-<input type="number" id="currentTarget" step="0.01">
-</div>
-<div class="input-group">
-<label>Quantity</label>
-<input type="number" id="quantity">
 </div>
 </div>
 </div>
@@ -179,15 +110,9 @@
 <script src="utils/volumeParser.js"></script>
 <script src="engines/setupEngine.js"></script>
 <script src="engines/momentumNewScan.js"></script>
-<script src="engines/momentumWatchlist.js"></script>
-<script src="engines/momentumTrade.js"></script>
 <script src="engines/newScanEngine.js"></script>
-<script src="engines/watchlistEngine.js"></script>
-<script src="engines/tradeManagementEngine.js"></script>
 <script src="engines/tradePlanEngine.js"></script>
 <script src="engines/reasoningNewScan.js"></script>
-<script src="engines/reasoningWatchlist.js"></script>
-<script src="engines/reasoningTrade.js"></script>
 <script src="engines/positionSizeEngine.js"></script>
 <script src="engines/analysisEngine.js"></script>
 <script src="script.js"></script>

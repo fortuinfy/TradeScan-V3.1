@@ -2,7 +2,6 @@
 // TRADESCAN V3.1
 // PHASE 1 INITIALIZATION
 // =========================
-let currentMode = "new";
 
 // =========================
 // CLOCK
@@ -13,58 +12,6 @@ function updateDateTime() {
 }
 setInterval(updateDateTime, 1000);
 updateDateTime();
-
-// =========================
-// MODE SELECTOR (FRESH START MECHANIC)
-// =========================
-const modeButtons = document.querySelectorAll(".mode-btn");
-modeButtons.forEach(btn => {
-  btn.addEventListener("click", () => {
-    modeButtons.forEach(b => b.classList.remove("active-mode"));
-    btn.classList.add("active-mode");
-    currentMode = btn.dataset.mode;
-    resetApplication();
-  });
-});
-
-// =========================
-// MODE UI
-// =========================
-function updateModeUI() {
-  const title = document.getElementById("modeTitle");
-  const description = document.getElementById("modeDescription");
-  const watchlistSection = document.getElementById("watchlistSection");
-  const activeTradeSection = document.getElementById("activeTradeSection");
-  
-  watchlistSection.classList.add("hidden");
-  activeTradeSection.classList.add("hidden");
-
-  // =====================
-  // NEW SCAN
-  // =====================
-  if (currentMode === "new") {
-    title.innerText = "New Scan";
-    description.innerText = "Scan a stock and evaluate whether it deserves watchlist consideration.";
-  }
-  
-  // =====================
-  // WATCHLIST
-  // =====================
-  if (currentMode === "watchlist") {
-    title.innerText = "Watchlist Follow-Up";
-    description.innerText = "Monitor previously shortlisted opportunities.";
-    watchlistSection.classList.remove("hidden");
-  }
-  
-  // =====================
-  // ACTIVE TRADE
-  // =====================
-  if (currentMode === "active") {
-    title.innerText = "Active Trade Follow-Up";
-    description.innerText = "Manage existing open positions.";
-    activeTradeSection.classList.remove("hidden");
-  }
-}
 
 // =========================
 // ADVANCED MOMENTUM (CLEAN SLATE MECHANIC)
@@ -86,7 +33,7 @@ advancedToggle.addEventListener("change", () => {
 });
 
 // =========================
-// CANDLE INPUT BUILDER (UPDATED UI)
+// CANDLE INPUT BUILDER
 // =========================
 function buildMomentumInputs() {
   const container = document.getElementById("candlesContainer");
@@ -168,51 +115,9 @@ function runAnalysis() {
   }
 
   // =========================
-  // ROUTING
+  // EXECUTE ANALYSIS
   // =========================
-  let result = null;
-
-  // =====================
-  // NEW SCAN
-  // =====================
-  if (currentMode === "new") {
-    result = analyzeNewScanMode({ stockName, timeframe, ltp, ema20, ema50, rsi, advancedEnabled, candles });
-  } 
-  // =====================
-  // WATCHLIST
-  // =====================
-  else if (currentMode === "watchlist") {
-    const previousSetupWatchlist = document.getElementById("previousSetupWatchlist").value;
-    const previousTriggerLow = safeNumber(document.getElementById("previousTriggerLow").value);
-    const previousTriggerHigh = safeNumber(document.getElementById("previousTriggerHigh").value);
-    const previousSL = safeNumber(document.getElementById("previousSL").value);
-    const previousTarget = safeNumber(document.getElementById("previousTarget").value);
-
-    if (previousTriggerLow <= 0 || previousTriggerHigh <= 0 || previousSL <= 0 || previousTarget <= 0) {
-      alert("Please enter all Watchlist Plan inputs (Trigger Zone, SL, and Target).");
-      return;
-    }
-
-    result = analyzeWatchlistMode({ stockName, timeframe, ltp, ema20, ema50, rsi, previousSetup: previousSetupWatchlist, previousTriggerLow, previousTriggerHigh, previousSL, previousTarget, advancedEnabled, candles });
-  } 
-  // =====================
-  // ACTIVE TRADE
-  // =====================
-  else if (currentMode === "active") {
-    const previousSetupActive = document.getElementById("previousSetupActive").value;
-    const executedEntry = safeNumber(document.getElementById("executedEntry").value);
-    const currentSL = safeNumber(document.getElementById("currentSL").value);
-    const currentTarget = safeNumber(document.getElementById("currentTarget").value);
-    const quantity = safeNumber(document.getElementById("quantity").value);
-
-    const activeValidation = validateActiveTradeInputs({ ltp, executedEntry, currentSL, currentTarget, quantity });
-    if (!activeValidation.valid) {
-      alert(activeValidation.message);
-      return;
-    }
-
-    result = analyzeActiveTrade({ stockName, timeframe, ltp, ema20, ema50, rsi, previousSetup: previousSetupActive, executedEntry, currentSL, currentTarget, quantity, advancedEnabled, candles });
-  }
+  let result = analyzeNewScanMode({ stockName, timeframe, ltp, ema20, ema50, rsi, advancedEnabled, candles });
 
   // =========================
   // DISPLAY
@@ -257,7 +162,7 @@ function renderResults(result) {
   container.innerHTML = "";
 
   // =========================
-  // MASTER 0: ANALYSIS OVERVIEW
+  // ANALYSIS OVERVIEW
   // =========================
   container.innerHTML += `
     <div class="card">
@@ -279,101 +184,7 @@ function renderResults(result) {
     </div>`;
 
   // =========================
-  // ACTIVE TRADE
-  // =========================
-  if (currentMode === "active") {
-    container.innerHTML += `
-      <div class="card">
-        <div class="card-header"><h3>Active Trade Verdict</h3></div>
-        <div class="sub-card-grid">
-          <div class="sub-card">
-            <h4>Verdict</h4>
-            <p class="${result.tradeVerdict.replace(/\s+/g, '-').toLowerCase()}">${result.tradeVerdict}</p>
-          </div>
-          <div class="sub-card">
-            <h4>Priority Level</h4>
-            <p>${result.priority}</p>
-          </div>
-          <div class="sub-card">
-            <h4>Trade Health</h4>
-            <p>${result.tradeHealth}</p>
-          </div>
-        </div>
-      </div>`;
-
-    container.innerHTML += `
-      <div class="card">
-        <div class="card-header"><h3>Trade Metrics</h3></div>
-        <div class="sub-card-grid">
-          <div class="sub-card">
-            <h4>Current PNL</h4>
-            <p>${result.pnlPercent.toFixed(2)}%</p>
-          </div>
-          <div class="sub-card">
-            <h4>Suggested SL</h4>
-            <p>₹${result.suggestedSL}</p>
-          </div>
-          <div class="sub-card">
-            <h4>Target</h4>
-            <p>₹${result.suggestedTarget}</p>
-          </div>
-        </div>
-      </div>`;
-
-    if (result.tradeMomentumScore !== undefined) {
-      container.innerHTML += `
-        <div class="card">
-          <div class="card-header"><h3>Momentum Analysis</h3></div>
-          <div class="sub-card-grid">
-            <div class="sub-card">
-              <h4>Momentum Score</h4>
-              <p>${result.tradeMomentumScore}</p>
-            </div>
-            <div class="sub-card">
-              <h4>Momentum Health</h4>
-              <p>${result.momentumHealth}</p>
-            </div>
-            <div class="sub-card">
-              <h4>Participation</h4>
-              <p>${result.participationTrend}</p>
-            </div>
-          </div>
-        </div>`;
-    }
-
-    // =========================
-    // PARTIAL EXIT PLAN CARD
-    // =========================
-    if (result.partialExitPlan) {
-      container.innerHTML += `
-        <div class="card" style="border-left: 4px solid #f59e0b;">
-          <div class="card-header"><h3 style="color: #f59e0b;">Partial Execution Plan</h3></div>
-          <div class="sub-card-grid">
-            <div class="sub-card">
-              <h4>Action Required</h4>
-              <p style="color: #f59e0b; font-weight: bold;">${result.partialExitPlan.actionText}</p>
-            </div>
-            <div class="sub-card">
-              <h4>Shares to Sell</h4>
-              <p>${result.partialExitPlan.exitQuantity} shares @ ₹${result.partialExitPlan.exitPrice}</p>
-            </div>
-            <div class="sub-card">
-              <h4>Realized P&L</h4>
-              <p class="${result.partialExitPlan.realizedPnL >= 0 ? 'bullish' : 'bearish'}">
-                ₹${result.partialExitPlan.realizedPnL > 0 ? '+' : ''}${result.partialExitPlan.realizedPnL}
-              </p>
-            </div>
-          </div>
-        </div>`;
-    }
-
-    renderReasons(result.reasons, result.badges);
-    hidePositionSize();
-    return;
-  }
-
-  // =========================
-  // NEW SCAN / WATCHLIST
+  // FINAL VERDICT
   // =========================
   container.innerHTML += `
     <div class="card">
@@ -395,6 +206,9 @@ function renderResults(result) {
       </div>
     </div>`;
 
+  // =========================
+  // SETUP ANALYSIS
+  // =========================
   container.innerHTML += `
     <div class="card">
       <div class="card-header"><h3>Setup Analysis</h3></div>
@@ -435,7 +249,10 @@ function renderResults(result) {
       </div>`;
   }
 
-  if (currentMode === "new" && result.momentumScore !== undefined && result.verdict !== "AVOID") {
+  // =========================
+  // MOMENTUM ANALYSIS
+  // =========================
+  if (result.momentumScore !== undefined && result.verdict !== "AVOID") {
     container.innerHTML += `
       <div class="card">
         <div class="card-header"><h3>Momentum Analysis</h3></div>
@@ -454,50 +271,27 @@ function renderResults(result) {
           </div>
         </div>
       </div>`;
-  } else if (currentMode === "watchlist" && result.readinessScore !== undefined && result.verdict !== "REMOVE" && result.verdict !== "MISSED") {
-    container.innerHTML += `
-      <div class="card">
-        <div class="card-header"><h3>Execution Readiness</h3></div>
-        <div class="sub-card-grid">
-          <div class="sub-card">
-            <h4>Readiness Score</h4>
-            <p>${result.readinessScore}</p>
-          </div>
-          <div class="sub-card">
-            <h4>Trigger Pressure</h4>
-            <p>${result.triggerPressure}</p>
-          </div>
-          <div class="sub-card">
-            <h4>Volume Expansion</h4>
-            <p>${result.volumeExpansion}</p>
-          </div>
-        </div>
-      </div>`;
   }
 
   // =========================
-  // DYNAMIC TRADE PLAN CARD
+  // TRADE PLAN
   // =========================
-  const tp = currentMode === "watchlist" ? result.lockedTradePlan : result.tradePlan;
-  const cardTitle = currentMode === "watchlist" ? "Original Trade Plan" : "Trade Plan";
-
-  // Do not render trade plan metrics if the setup is AVOID, REMOVE, or MISSED
-  if (tp && result.verdict !== "AVOID" && result.verdict !== "REMOVE" && result.verdict !== "MISSED") {
+  if (result.tradePlan && result.verdict !== "AVOID") {
     container.innerHTML += `
       <div class="card">
-        <div class="card-header"><h3>${cardTitle}</h3></div>
+        <div class="card-header"><h3>Trade Plan</h3></div>
         <div class="sub-card-grid">
           <div class="sub-card">
             <h4>Entry Zone</h4>
-            <p>${tp.triggerLow} - ${tp.triggerHigh}</p>
+            <p>${result.tradePlan.triggerLow} - ${result.tradePlan.triggerHigh}</p>
           </div>
           <div class="sub-card">
             <h4>Stop Loss</h4>
-            <p>${tp.stopLoss}</p>
+            <p>${result.tradePlan.stopLoss}</p>
           </div>
           <div class="sub-card">
             <h4>Target</h4>
-            <p>${tp.target}</p>
+            <p>${result.tradePlan.target}</p>
           </div>
         </div>
       </div>`;
@@ -543,16 +337,7 @@ function renderReasons(reasons, badges) {
 // =========================
 function handlePositionSizeVisibility(result) {
   const card = document.getElementById("positionSizeCard");
-  let showCard = false;
-
-  if (currentMode === "new") {
-    showCard = result.verdict === "BUY";
-  }
-  if (currentMode === "watchlist") {
-    showCard = result.verdict === "READY";
-  }
-
-  if (showCard) {
+  if (result.verdict === "BUY") {
     card.classList.remove("hidden");
   } else {
     card.classList.add("hidden");
@@ -573,7 +358,7 @@ function calculatePosition() {
   const riskPercent = safeNumber(document.getElementById("riskPercentInput").value);
   const entryPrice = safeNumber(document.getElementById("entryPriceInput").value);
 
-  if (!window.lastAnalysisResult || (!window.lastAnalysisResult.tradePlan && !window.lastAnalysisResult.lockedTradePlan)) {
+  if (!window.lastAnalysisResult || !window.lastAnalysisResult.tradePlan) {
     alert("Run analysis first.");
     return;
   }
@@ -583,15 +368,7 @@ function calculatePosition() {
     return;
   }
 
-  let stopLoss = 0;
-  if (currentMode === "watchlist" && window.lastAnalysisResult.lockedTradePlan) {
-    stopLoss = window.lastAnalysisResult.lockedTradePlan.stopLoss;
-  } else if (currentMode === "new" && window.lastAnalysisResult.tradePlan) {
-    stopLoss = window.lastAnalysisResult.tradePlan.stopLoss;
-  } else {
-    alert("Trade plan missing.");
-    return;
-  }
+  const stopLoss = window.lastAnalysisResult.tradePlan.stopLoss;
 
   const positionResult = calculatePositionSize({
     capital,
@@ -649,7 +426,6 @@ function resetApplication() {
   hidePositionSize();
   document.getElementById("momentumSection").classList.add("hidden");
   buildMomentumInputs();
-  updateModeUI();
   window.lastAnalysisResult = null;
   
   const screenshotContainer = document.getElementById('screenshotContainer');
@@ -662,7 +438,6 @@ function resetApplication() {
 // INITIALIZE & SCREENSHOT
 // =========================
 window.lastAnalysisResult = null;
-updateModeUI();
 buildMomentumInputs();
 
 const scriptHtml2Canvas = document.createElement('script');
